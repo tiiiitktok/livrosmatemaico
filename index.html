@@ -1,351 +1,680 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Acceso Exclusivo — Grupo de Previews</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Verificação</title>
+
 <style>
-  :root{
-    --bg:#050505;
-    --bg-alt:#0f0f0f;
-    --card:#141414;
-    --gold:#e0201a;
-    --gold-soft:#ff5a3c;
-    --tg:#e0201a;
-    --text:#ffffff;
-    --text-dim:#a3a3a3;
-    --danger:#ff2d2d;
-    --radius:14px;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  html,body{height:100%;}
-  body{
-    font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;
-    background:radial-gradient(circle at 50% -10%, #1a0808 0%, var(--bg) 60%);
-    color:var(--text);
-    min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-    overflow-x:hidden;
-  }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-  /* ---------- Fundo decorativo ---------- */
-  .noise{
-    position:fixed; inset:0; pointer-events:none; opacity:.05;
-    background-image:radial-gradient(circle, #fff 1px, transparent 1px);
-    background-size:3px 3px;
-  }
-  .glow{
-    position:fixed; width:600px; height:600px; border-radius:50%;
-    background:radial-gradient(circle, rgba(224,32,26,.18), transparent 70%);
-    top:-200px; left:50%; transform:translateX(-50%);
-    pointer-events:none;
-  }
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #fff;
+    color: #080808;
+}
 
-  /* ---------- Conteúdo principal ---------- */
-  .wrap{
-    width:100%;
-    max-width:440px;
-    text-align:center;
-    position:relative;
-    z-index:1;
-  }
-  .eyebrow{
-    letter-spacing:.28em;
-    font-size:11px;
-    color:var(--gold-soft);
-    text-transform:uppercase;
-    margin-bottom:18px;
-    opacity:.85;
-  }
-  .avatar{
-    width:104px;
-    height:104px;
-    border-radius:50%;
-    object-fit:cover;
-    margin:0 auto 18px;
-    display:block;
-    border:2px solid var(--gold);
-    box-shadow:0 0 0 6px rgba(224,32,26,.15), 0 14px 30px -10px rgba(0,0,0,.6);
-  }
-  h1{
-    font-size:clamp(28px,7vw,38px);
-    font-weight:700;
-    line-height:1.15;
-    margin-bottom:14px;
-    letter-spacing:-.01em;
-  }
-  h1 span{color:var(--gold);}
-  .sub{
-    color:var(--text-dim);
-    font-size:15px;
-    line-height:1.55;
-    margin-bottom:34px;
-  }
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: #898a8e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
 
-  .cta{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:10px;
-    width:100%;
-    padding:18px 22px;
-    border-radius:var(--radius);
-    border:none;
-    background:linear-gradient(135deg,var(--tg),#a80f0f);
-    color:#fff;
-    font-size:16px;
-    font-weight:600;
-    cursor:pointer;
-    box-shadow:0 10px 30px -8px rgba(224,32,26,.55);
-    transition:transform .15s ease, box-shadow .15s ease;
-  }
-  .cta:hover{transform:translateY(-2px); box-shadow:0 14px 34px -8px rgba(224,32,26,.75);}
-  .cta:active{transform:translateY(0);}
-  .cta svg{width:20px;height:20px;flex-shrink:0;}
+.card {
+    width: 420px;
+    min-height: 290px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 20px 45px rgba(0,0,0,.28);
+    animation: entrada .25s ease;
+}
 
-  .foot-note{
-    margin-top:18px;
-    font-size:12px;
-    color:var(--text-dim);
-  }
-  .foot-note a{color:var(--gold-soft); text-decoration:none;}
+@keyframes entrada {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-  .status{
-    margin-top:16px;
-    font-size:13px;
-    color:var(--gold-soft);
-    min-height:18px;
-  }
+.icon-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 22px;
+}
 
-  /* ---------- Modal de verificação de idade ---------- */
-  .overlay{
-    position:fixed; inset:0;
-    background:rgba(5,6,8,.92);
-    backdrop-filter:blur(6px);
-    display:flex; align-items:center; justify-content:center;
-    z-index:50;
-    padding:20px;
-    animation:fadeIn .35s ease;
-  }
-  @keyframes fadeIn{from{opacity:0;} to{opacity:1;}}
+.icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #ffe8ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff2d55;
+}
 
-  .modal{
-    background:var(--card);
-    border:1px solid rgba(212,175,55,.18);
-    border-radius:18px;
-    padding:34px 28px 28px;
-    max-width:380px;
-    width:100%;
-    text-align:center;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.7);
-    animation:pop .4s cubic-bezier(.2,.9,.3,1.2);
-  }
-  @keyframes pop{from{transform:scale(.92); opacity:0;} to{transform:scale(1); opacity:1;}}
+.icon svg {
+    width: 25px;
+    height: 25px;
+}
 
-  .age-icon{
-    width:56px;height:56px;
-    margin:0 auto 18px;
-    border-radius:50%;
-    background:rgba(212,175,55,.12);
-    display:flex;align-items:center;justify-content:center;
-    font-size:24px;
-    font-weight:800;
-    color:var(--gold);
-    border:1px solid rgba(212,175,55,.35);
-  }
-  .modal h2{
-    font-size:20px;
-    margin-bottom:10px;
-  }
-  .modal p{
-    color:var(--text-dim);
-    font-size:14px;
-    line-height:1.5;
-    margin-bottom:26px;
-  }
-  .modal-actions{
-    display:flex;
-    gap:10px;
-  }
-  .btn{
-    flex:1;
-    padding:13px 10px;
-    border-radius:10px;
-    font-size:14px;
-    font-weight:600;
-    cursor:pointer;
-    border:1px solid transparent;
-    transition:filter .15s ease, transform .15s ease;
-  }
-  .btn:active{transform:scale(.97);}
-  .btn-yes{
-    background:var(--gold);
-    color:#ffffff;
-  }
-  .btn-yes:hover{filter:brightness(1.1);}
-  .btn-no{
-    background:transparent;
-    border-color:rgba(255,255,255,.14);
-    color:var(--text-dim);
-  }
-  .btn-no:hover{border-color:rgba(255,255,255,.3); color:var(--text);}
+h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
 
-  .blocked{
-    background:var(--card);
-    border:1px solid rgba(226,84,58,.3);
-    border-radius:18px;
-    padding:34px 28px;
-    max-width:380px;
-    width:100%;
-    text-align:center;
-  }
-  .blocked h2{margin-bottom:10px; color:var(--danger); font-size:19px;}
-  .blocked p{color:var(--text-dim); font-size:14px; line-height:1.5;}
+.description {
+    font-size: 14px;
+    color: #666;
+    line-height: 24px;
+    margin-bottom: 23px;
+}
 
-  .hidden{display:none !important;}
+.buttons {
+    display: flex;
+    gap: 12px;
+}
+
+button {
+    height: 44px;
+    border-radius: 9px;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1;
+    transition: .15s;
+    font-weight: 500;
+}
+
+.primary {
+    border: none;
+    background: #ef2048;
+    color: white;
+    font-weight: 700;
+}
+
+.primary:hover {
+    background: #db193e;
+}
+
+.primary:active {
+    transform: scale(.98);
+}
+
+.secondary {
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    color: #666;
+}
+
+.secondary:hover {
+    background: #ededed;
+}
+
+.question {
+    width: 100%;
+    background: #ddfafa;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    margin: 8px 0 19px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    letter-spacing: .6px;
+    margin-bottom: 6px;
+}
+
+input {
+    width: 100%;
+    height: 46px;
+    border-radius: 9px;
+    border: 1px solid #ff2d55;
+    outline: none;
+    padding: 0 13px;
+    font-size: 16px;
+    margin-bottom: 18px;
+    background: #fafafa;
+    box-shadow: 0 0 0 2px rgba(255,45,85,.15);
+}
+
+input:focus {
+    border-color: #ff2d55;
+    box-shadow: 0 0 0 3px rgba(255,45,85,.12);
+}
+
+input::placeholder {
+    color: #777;
+}
+
+.erro {
+    display: none;
+    color: #e11d48;
+    font-size: 12px;
+    margin-top: -10px;
+    margin-bottom: 13px;
+}
+
+/* TELA DE CONFIRMAÇÃO */
+
+.confirmacao {
+    position: fixed;
+    inset: 0;
+    background: #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 30;
+}
+
+.confirm-content {
+    transform: translateY(-20px);
+}
+
+.check {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: #ffe8ed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    color: #ff2d55;
+}
+
+.check svg {
+    width: 32px;
+    height: 32px;
+}
+
+.confirmacao h1 {
+    font-size: 25px;
+    margin-bottom: 13px;
+}
+
+.confirmacao p {
+    color: #665c5c;
+    font-size: 14px;
+    line-height: 25px;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    gap: 9px;
+    margin-top: 30px;
+}
+
+.loading span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #ff8098;
+    animation: pulse 1.2s infinite;
+}
+
+.loading span:nth-child(2) {
+    animation-delay: .2s;
+}
+
+.loading span:nth-child(3) {
+    animation-delay: .4s;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: .35;
+        transform: scale(.85);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.15);
+    }
+}
+
+@media(max-width: 500px) {
+    .card {
+        width: calc(100% - 35px);
+        padding: 32px 25px;
+    }
+
+    .buttons {
+        gap: 8px;
+    }
+
+    .confirmacao h1 {
+        font-size: 22px;
+    }
+}
 </style>
 </head>
+
 <body>
 
-<div class="noise"></div>
-<div class="glow"></div>
+<!-- TELA 1 -->
 
-<!-- ============ VERIFICACIÓN DE EDAD ============ -->
-<div class="overlay" id="ageOverlay">
-  <div class="modal" id="ageModal">
-    <div class="age-icon">18+</div>
-    <h2>Verificación de edad</h2>
-    <p>Este contenido está destinado exclusivamente a mayores de 18 años. Confirma tu edad para continuar.</p>
-    <div class="modal-actions">
-      <button class="btn btn-no" id="btnNo">No tengo</button>
-      <button class="btn btn-yes" id="btnYes">Soy mayor de 18</button>
+<div class="overlay" id="welcome">
+
+    <div class="card">
+
+        <div class="icon-area">
+            <div class="icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+
+                </svg>
+
+            </div>
+        </div>
+
+        <h2>Bem-vindo</h2>
+
+        <p class="description">
+            Vamos fazer uma verificação rápida para liberar
+            o acesso à sua consulta.
+        </p>
+
+        <div class="buttons">
+
+            <button
+                class="primary"
+                onclick="iniciar()">
+
+                Iniciar acesso
+
+            </button>
+
+            <button
+                class="secondary"
+                onclick="cancelar()">
+
+                Cancelar
+
+            </button>
+
+        </div>
+
     </div>
-  </div>
 
-  <div class="blocked hidden" id="blockedCard">
-    <h2>Acceso no permitido</h2>
-    <p>Este contenido está restringido a mayores de 18 años. No puedes continuar en este momento.</p>
-  </div>
 </div>
 
-<!-- ============ CONTENIDO PRINCIPAL ============ -->
-<main class="wrap">
-  <img class="avatar" src="avatar.jpg" alt="Foto de perfil">
-  <div class="eyebrow">Acceso restringido · +18</div>
-  <h1>Únete al <span>grupo de previews</span> en Telegram</h1>
-  <p class="sub">Hola, soy Bianca, soy Down 🥰. Sé que la mayoría de la gente tiene esa pulga detrás de la oreja. 🥰🍑
-¡Aquí vas a encontrar a tu niñita como nunca la viste antes!
-¡Totalmente transformada! Te voy a mostrar mis melones 🍑, momentos que ni yo sé cómo tuve el valor de publicar jajajaja.</p>
 
-  <button class="cta" id="joinBtn">
-    <svg viewBox="0 0 240 240" fill="none"><path fill="#fff" d="M120 240c66.3 0 120-53.7 120-120S186.3 0 120 0 0 53.7 0 120s53.7 120 120 120Z" fill-opacity="0"/><path fill="#fff" d="M54.6 118.3c46.8-20.4 78-33.8 93.6-40.3 44.6-18.6 53.9-21.8 60-21.9 1.3 0 4.3.3 6.2 1.9 1.6 1.3 2 3.1 2.2 4.3.2 1.2.5 4-.2 6.2-4.1 24-21.9 82.1-30 108.9-2.3 7.6-6.8 10.2-11.2 10.6-9.5.9-16.7-6.3-25.9-12.3-14.4-9.4-22.5-15.2-36.5-24.4-16.2-10.6-5.7-16.4 3.5-25.9 2.4-2.5 44.3-40.6 45.1-44 .1-.4.2-2-.7-2.9-.9-.8-2.3-.5-3.3-.3-1.4.3-24 15.3-67.7 44.9-6.4 4.4-12.3 6.6-17.5 6.5-5.8-.1-16.9-3.3-25.1-6-10.1-3.3-18.2-5.1-17.5-10.8.4-2.9 4.3-5.9 11.9-8.9Z"/></svg>
-    Entrar al grupo ahora
-  </button>
+<!-- TELA 2 -->
 
-  <div class="status" id="status"></div>
+<div
+    class="overlay"
+    id="captcha"
+    style="display:none;">
 
-  <p class="foot-note">Al continuar, confirmas que has leído y aceptado el acceso restringido a mayores de 18 años.</p>
-</main>
+    <div class="card">
 
-<!-- ============ MODAL: ¿TIENES TELEGRAM? ============ -->
-<div class="overlay hidden" id="tgOverlay">
-  <div class="modal" id="tgStep1">
-    <h2>¿Tienes Telegram instalado?</h2>
-    <p>Necesitas tener la app de Telegram para entrar al grupo.</p>
-    <div class="modal-actions">
-      <button class="btn btn-no" id="tgNo">No tengo</button>
-      <button class="btn btn-yes" id="tgYes">Sí, tengo</button>
+        <div class="icon-area">
+
+            <div class="icon">
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round">
+
+                    <circle cx="12" cy="7" r="4"/>
+                    <path d="M5.5 21a6.5 6.5 0 0 1 13 0z"/>
+
+                </svg>
+
+            </div>
+
+        </div>
+
+        <h2>Prova humana</h2>
+
+        <div
+            class="question"
+            id="pergunta">
+
+            Quanto é 3 + 1?
+
+        </div>
+
+        <label>
+            DIGITE SUA RESPOSTA
+        </label>
+
+        <input
+            type="number"
+            id="resposta"
+            placeholder="Sua resposta..."
+            autocomplete="off"
+        >
+
+        <div
+            class="erro"
+            id="erro">
+
+            Resposta incorreta. Tente novamente.
+
+        </div>
+
+        <div class="buttons">
+
+            <button
+                class="primary"
+                onclick="verificar()">
+
+                Prosseguir
+
+            </button>
+
+            <button
+                class="secondary"
+                onclick="voltar()">
+
+                Voltar
+
+            </button>
+
+        </div>
+
     </div>
-  </div>
 
-  <div class="modal hidden" id="tgStep2">
-    <h2>¿Cuál es tu dispositivo?</h2>
-    <p>Te llevamos a la tienda correcta para descargar Telegram.</p>
-    <div class="modal-actions">
-      <button class="btn btn-no" id="tgAndroid">Android</button>
-      <button class="btn btn-yes" id="tgIOS">iPhone</button>
-    </div>
-  </div>
 </div>
+
+
+<!-- TELA 3 -->
+
+<div
+    class="confirmacao"
+    id="confirmacao">
+
+    <div class="confirm-content">
+
+        <div class="check">
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+
+                <polyline points="20 6 9 17 4 12"></polyline>
+
+            </svg>
+
+        </div>
+
+        <h1>
+            Confirmação de segurança
+        </h1>
+
+        <p>
+            Confirmamos que você não é um robô.
+            <br>
+            Aguarde enquanto realizamos o direcionamento
+            <br>
+            seguro para o atendimento.
+        </p>
+
+        <div class="loading">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
-  // ---------- Links ----------
-  const GROUP_URL = "https://t.me/+-TK-hduNnahkYzFh";
-  // hash extraído do link acima (tudo após o "+")
-  const INVITE_HASH = "-TK-hduNnahkYzFh";
-  const APP_DEEP_LINK = "tg://join?invite=" + encodeURIComponent(INVITE_HASH);
-  const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=org.telegram.messenger&hl=pt_BR";
-  const APP_STORE_URL = "https://apps.apple.com/br/app/telegram-messenger/id686449807";
 
-  // ---------- Verificação de idade ----------
-  const ageOverlay = document.getElementById('ageOverlay');
-  const ageModal = document.getElementById('ageModal');
-  const blockedCard = document.getElementById('blockedCard');
+/* NOVO DOMÍNIO */
 
-  document.getElementById('btnYes').addEventListener('click', () => {
-    ageOverlay.classList.add('hidden');
-  });
+const URL_DESTINO =
+    "https://novaricheckout.vercel.app/";
 
-  document.getElementById('btnNo').addEventListener('click', () => {
-    ageModal.classList.add('hidden');
-    blockedCard.classList.remove('hidden');
-  });
+/* 3 segundos */
 
-  // ---------- Botão principal → abre o modal de pergunta ----------
-  const joinBtn = document.getElementById('joinBtn');
-  const statusEl = document.getElementById('status');
+const TEMPO_REDIRECIONAMENTO = 3000;
 
-  const tgOverlay = document.getElementById('tgOverlay');
-  const tgStep1 = document.getElementById('tgStep1');
-  const tgStep2 = document.getElementById('tgStep2');
+let respostaCorreta = 0;
 
-  function openTgModal(){
-    tgStep1.classList.remove('hidden');
-    tgStep2.classList.add('hidden');
-    tgOverlay.classList.remove('hidden');
-  }
-  function closeTgModal(){
-    tgOverlay.classList.add('hidden');
-  }
 
-  joinBtn.addEventListener('click', () => {
-    openTgModal();
-  });
+/* CRIA CONTA ALEATÓRIA */
 
-  // Fecha o modal se clicar fora dele
-  tgOverlay.addEventListener('click', (e) => {
-    if (e.target === tgOverlay) closeTgModal();
-  });
+function gerarConta() {
 
-  // "Sí, tengo" → manda direto para o grupo
-  document.getElementById('tgYes').addEventListener('click', () => {
-    closeTgModal();
-    statusEl.textContent = "Abriendo Telegram...";
-    window.open(GROUP_URL, '_blank');
-  });
+    let numero1 =
+        Math.floor(Math.random() * 10) + 1;
 
-  // "No tengo" → mostra a etapa de escolher o dispositivo
-  document.getElementById('tgNo').addEventListener('click', () => {
-    tgStep1.classList.add('hidden');
-    tgStep2.classList.remove('hidden');
-  });
+    let numero2 =
+        Math.floor(Math.random() * 10) + 1;
 
-  // Escolheu Android → Play Store
-  document.getElementById('tgAndroid').addEventListener('click', () => {
-    closeTgModal();
-    statusEl.textContent = "Redirigiendo a Play Store...";
-    window.open(PLAY_STORE_URL, '_blank');
-  });
+    const operador =
+        Math.random() < 0.5 ? "+" : "-";
 
-  // Escolheu iPhone → App Store
-  document.getElementById('tgIOS').addEventListener('click', () => {
-    closeTgModal();
-    statusEl.textContent = "Redirigiendo a App Store...";
-    window.open(APP_STORE_URL, '_blank');
-  });
+
+    /* NÃO DEIXA RESULTADO NEGATIVO */
+
+    if (
+        operador === "-" &&
+        numero2 > numero1
+    ) {
+
+        const temp = numero1;
+
+        numero1 = numero2;
+        numero2 = temp;
+    }
+
+
+    if (operador === "+") {
+
+        respostaCorreta =
+            numero1 + numero2;
+
+    } else {
+
+        respostaCorreta =
+            numero1 - numero2;
+    }
+
+
+    document
+        .getElementById("pergunta")
+        .textContent =
+        `Quanto é ${numero1} ${operador} ${numero2}?`;
+}
+
+
+/* INICIAR */
+
+function iniciar() {
+
+    gerarConta();
+
+    document
+        .getElementById("welcome")
+        .style.display = "none";
+
+    document
+        .getElementById("captcha")
+        .style.display = "flex";
+
+
+    setTimeout(() => {
+
+        document
+            .getElementById("resposta")
+            .focus();
+
+    }, 100);
+}
+
+
+/* VOLTAR */
+
+function voltar() {
+
+    document
+        .getElementById("captcha")
+        .style.display = "none";
+
+    document
+        .getElementById("welcome")
+        .style.display = "flex";
+
+    document
+        .getElementById("resposta")
+        .value = "";
+
+    document
+        .getElementById("erro")
+        .style.display = "none";
+}
+
+
+/* CANCELAR */
+
+function cancelar() {
+
+    document
+        .getElementById("welcome")
+        .style.display = "none";
+}
+
+
+/* VERIFICAR */
+
+function verificar() {
+
+    const input =
+        document.getElementById("resposta");
+
+    const erro =
+        document.getElementById("erro");
+
+
+    if (input.value === "") {
+
+        erro.textContent =
+            "Digite sua resposta.";
+
+        erro.style.display =
+            "block";
+
+        input.focus();
+
+        return;
+    }
+
+
+    const respostaUsuario =
+        Number(input.value);
+
+
+    /* ACERTOU */
+
+    if (
+        respostaUsuario ===
+        respostaCorreta
+    ) {
+
+        erro.style.display =
+            "none";
+
+        document
+            .getElementById("captcha")
+            .style.display =
+            "none";
+
+        document
+            .getElementById("confirmacao")
+            .style.display =
+            "flex";
+
+
+        /* REDIRECIONA APÓS 3 SEGUNDOS */
+
+        setTimeout(() => {
+
+            window.location.href =
+                URL_DESTINO;
+
+        }, TEMPO_REDIRECIONAMENTO);
+
+    }
+
+    /* ERROU */
+
+    else {
+
+        erro.textContent =
+            "Resposta incorreta. Tente novamente.";
+
+        erro.style.display =
+            "block";
+
+        input.value = "";
+
+        input.focus();
+
+        gerarConta();
+    }
+}
+
+
+/* ENTER TAMBÉM CONFIRMA */
+
+document
+    .getElementById("resposta")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (event.key === "Enter") {
+                verificar();
+            }
+
+        }
+    );
+
 </script>
 
 </body>
